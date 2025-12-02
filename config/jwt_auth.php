@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'user_model' => env('JWT_USER_MODEL', \App\Models\User::class),
+    'user_model' => env('JWT_USER_MODEL', "\App\Models\User::class"),
 
     // JWT settings
     'secret' => env('JWT_SECRET'),              // Should be a strong secret

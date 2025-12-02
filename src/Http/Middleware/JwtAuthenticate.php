@@ -4,6 +4,7 @@ namespace Devkit2026\JwtAuth\Http\Middleware;
 
 use Closure;
 use Devkit2026\JwtAuth\DTO\UserDto;
+use Devkit2026\JwtAuth\Exceptions\JwtAuthException;
 use Devkit2026\JwtAuth\Services\JwtService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -52,7 +53,7 @@ class JwtAuthenticate
             }
 
         } catch (\Exception $e) {
-             if ($e instanceof \Devkit2026\JwtAuth\Exceptions\JwtAuthException) {
+             if ($e instanceof JwtAuthException) {
                  return $e->render($request);
              }
 

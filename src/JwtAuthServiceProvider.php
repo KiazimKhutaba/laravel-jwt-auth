@@ -20,7 +20,7 @@ class JwtAuthServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->mergeConfigFrom(__DIR__.'/config/jwt_auth.php', 'jwt_auth');
+        $this->mergeConfigFrom(__DIR__.'/../config/jwt_auth.php', 'jwt_auth');
 
         $this->app->singleton(JwtService::class, function ($app) {
             return new JwtService();
