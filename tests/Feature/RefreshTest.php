@@ -3,24 +3,13 @@
 namespace Devkit2026\JwtAuth\Tests\Feature;
 
 use Devkit2026\JwtAuth\Tests\TestCase;
+use Devkit2026\JwtAuth\Tests\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
-use Devkit2026\JwtAuth\Tests\User;
 
 class RefreshTest extends TestCase
 {
     use RefreshDatabase;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-        
-        User::create([
-            'email' => 'test@example.com',
-            'password' => Hash::make('Password123!'),
-            'email_verified_at' => now(),
-        ]);
-    }
 
     /** @test */
     public function it_can_refresh_token_with_cookie_method()
@@ -36,13 +25,14 @@ class RefreshTest extends TestCase
         $refreshToken = $loginResponse->getCookie('refresh_token', false)->getValue();
 
         // Refresh - use withUnencryptedCookie since session encryption is disabled in tests
+        $this->withCredentials(); // to enable cookies
         $response = $this->withUnencryptedCookie('refresh_token', $refreshToken)
             ->postJson('/api/auth/refresh');
 
         $response->assertStatus(200)
             ->assertJsonStructure(['access_token', 'user'])
             ->assertCookie('refresh_token');
-            
+
         // Ensure new refresh token is different (rotation)
         $newRefreshToken = $response->getCookie('refresh_token', false)->getValue();
         $this->assertNotEquals($refreshToken, $newRefreshToken);
@@ -69,7 +59,7 @@ class RefreshTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJsonStructure(['access_token', 'refresh_token', 'user']);
-            
+
         // Ensure new refresh token is different (rotation)
         $newRefreshToken = $response->json('refresh_token');
         $this->assertNotEquals($refreshToken, $newRefreshToken);
@@ -80,9 +70,22 @@ class RefreshTest extends TestCase
     {
         config(['jwt_auth.refresh_token_method' => 'cookie']);
 
+        $this->withCredentials();
+
         $response = $this->withUnencryptedCookie('refresh_token', 'invalid-token')
             ->postJson('/api/auth/refresh');
 
         $response->assertStatus(401);
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        User::create([
+            'email' => 'test@example.com',
+            'password' => Hash::make('Password123!'),
+            'email_verified_at' => now(),
+        ]);
     }
 }

@@ -5,6 +5,10 @@ return [
 
     // JWT settings
     'secret' => env('JWT_SECRET'),              // Should be a strong secret
+    
+    // Supported algorithms: HS256, HS384, HS512 (HMAC), RS256, RS384, RS512 (RSA)
+    // For HMAC algorithms (HS*), use a strong secret key
+    // For RSA algorithms (RS*), use private key for signing and public key for verification
     'algo' => env('JWT_ALGO', 'HS256'),
 
     'access_ttl' => env('JWT_ACCESS_TTL', 60),      // minutes

@@ -14,7 +14,7 @@ class LoginTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Create a user
         User::create([
             'email' => 'test@example.com',
