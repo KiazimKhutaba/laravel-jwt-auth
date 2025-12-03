@@ -22,7 +22,7 @@ class JwtService
     {
         $this->secret = config('jwt_auth.secret');
         $this->algo = config('jwt_auth.algo', 'HS256');
-        $this->accessTtl = config('jwt_auth.access_ttl', 60);
+        $this->accessTtl = (int)config('jwt_auth.access_ttl', 60);
     }
 
     public function generateAccessToken($user): string

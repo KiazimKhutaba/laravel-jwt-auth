@@ -112,7 +112,7 @@ class AuthService
         $this->refreshTokenRepo->create([
             'user_id' => $user->id,
             'token' => $refreshTokenHash,
-            'expires_at' => now()->addMinutes(config('jwt_auth.refresh_ttl')),
+            'expires_at' => now()->addMinutes((int)config('jwt_auth.refresh_ttl')),
             'ip' => request()->ip(),
             'user_agent' => request()->userAgent(),
         ]);
