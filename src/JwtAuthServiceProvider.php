@@ -47,7 +47,6 @@ class JwtAuthServiceProvider extends ServiceProvider
         $this->registerMigrations();
         $this->registerPublishing();
         $this->registerMiddleware();
-        $this->registerEvents();
         $this->registerCommands();
     }
 
@@ -58,14 +57,6 @@ class JwtAuthServiceProvider extends ServiceProvider
                 JwtSecretCommand::class,
             ]);
         }
-    }
-
-    protected function registerEvents(): void
-    {
-        Event::listen(
-            UserRegistered::class,
-            SendVerificationEmail::class
-        );
     }
 
     protected function registerRoutes(): void

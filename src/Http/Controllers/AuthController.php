@@ -13,6 +13,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Cookie;
+use Symfony\Component\HttpFoundation\Cookie as SymfonyCookie;
 
 class AuthController extends Controller
 {
@@ -24,7 +25,7 @@ class AuthController extends Controller
 
     public function register(RegisterRequest $request): JsonResponse
     {
-        $userDto = $this->authService->register($request->toDto());
+        $userDto = $this->authService->registerByEmailPassword($request->toDto());
 
         return $this->successResponse([
             'message' => 'User registered successfully. Please verify your email.',
@@ -55,19 +56,7 @@ class AuthController extends Controller
             return $this->successResponse($responseData);
         }
 
-        // Default: send refresh token as httpOnly cookie
-        $cookieName = config('jwt_auth.refresh_cookie_name', 'refresh_token');
-        $cookie = Cookie::make(
-            $cookieName,
-            $result['refresh_token'],
-            config('jwt_auth.refresh_ttl'), // minutes
-            '/',
-            null,
-            true, // secure
-            true, // httpOnly
-            false, // raw
-            'Strict' // sameSite
-        );
+        $cookie = $this->makeRefreshCookie($result['refresh_token']);
 
         return $this->successResponse($responseData)->withCookie($cookie);
     }
@@ -101,18 +90,7 @@ class AuthController extends Controller
         }
 
         // Send new refresh token as cookie
-        $cookieName = config('jwt_auth.refresh_cookie_name', 'refresh_token');
-        $cookie = Cookie::make(
-            $cookieName,
-            $result['refresh_token'],
-            config('jwt_auth.refresh_ttl'),
-            '/',
-            null,
-            true,
-            true,
-            false,
-            'Strict'
-        );
+        $cookie = $this->makeRefreshCookie($result['refresh_token']);
 
         return $this->successResponse($responseData)->withCookie($cookie);
     }
@@ -137,6 +115,24 @@ class AuthController extends Controller
         }
 
         return $this->successResponse(['message' => 'Logged out successfully']);
+    }
+
+    public function makeRefreshCookie(string $refresh_token): SymfonyCookie
+    {
+        // Default: send refresh token as httpOnly cookie
+        $cookieName = config('jwt_auth.refresh_cookie_name', 'refresh_token');
+
+        return Cookie::make(
+            $cookieName,
+            $refresh_token,
+            config('jwt_auth.refresh_ttl'), // minutes
+            '/',
+            null,
+            true, // secure
+            true, // httpOnly
+            false, // raw
+            'Strict' // sameSite
+        );
     }
 
     public function me(Request $request): JsonResponse

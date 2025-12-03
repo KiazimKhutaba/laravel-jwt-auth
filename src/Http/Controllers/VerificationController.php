@@ -2,14 +2,16 @@
 
 namespace Devkit2026\JwtAuth\Http\Controllers;
 
+use Devkit2026\JwtAuth\Attributes\EmitsEvent;
+use Illuminate\Auth\Events\Verified;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Auth\Events\Verified;
 
 class VerificationController extends Controller
 {
+    #[EmitsEvent(Verified::class, 'Dispatched when email is successfully verified')]
     public function verify(Request $request)
     {
         $userModel = config('jwt_auth.user_model');

@@ -2,6 +2,7 @@
 
 namespace Devkit2026\JwtAuth\Services;
 
+use Devkit2026\JwtAuth\Attributes\EmitsEvent;
 use Devkit2026\JwtAuth\DTO\LoginDto;
 use Devkit2026\JwtAuth\DTO\RegisterDto;
 use Devkit2026\JwtAuth\DTO\UserDto;
@@ -20,7 +21,9 @@ class AuthService
         protected RefreshTokenRepository $refreshTokenRepo
     ) {}
 
-    public function register(RegisterDto $dto): UserDto
+    
+    #[EmitsEvent(UserRegistered::class, 'Dispatched after user is created')]
+    public function registerByEmailPassword(RegisterDto $dto): UserDto
     {
         $userModel = config('jwt_auth.user_model');
         
@@ -81,7 +84,7 @@ class AuthService
              throw new JwtAuthException("User not found", 'ERR_USER_NOT_FOUND', 404);
         }
 
-        // Rotate refresh token if configured
+        // Rotate the refresh token if configured
         if (config('jwt_auth.rotate_refresh')) {
             $this->refreshTokenRepo->revoke($storedToken);
         }
